@@ -6,7 +6,7 @@
       "randomWaves": false,
       "waves": [
         {
-          "display": "1:1",
+          "display": "hi",
           "spawnStyle": "normal",
           "destroyStyle": "chainBlast",
           "elements": ["2:3", "4:5", "3:4"],
