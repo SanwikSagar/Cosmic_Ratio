@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
-    <meta charset="utf-t">
+    <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity Web Player | AstroidDestroyer</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
@@ -22,7 +22,6 @@
           height: 100%;
       }
 
-      /* Main container organizes the entire page layout */
       #page-container {
           width: 100vw;
           height: 100vh;
@@ -41,7 +40,7 @@
           border-bottom: 2px solid rgba(102, 126, 234, 0.5);
           backdrop-filter: blur(10px);
           z-index: 10;
-          flex-shrink: 0; /* Prevents the bar from shrinking */
+          flex-shrink: 0;
       }
       
       .title-section { display: flex; align-items: center; gap: 15px; }
@@ -129,7 +128,6 @@
       </div>
 
       <div id="unity-container">
-        <!-- The script now sets the internal width and height dynamically, so they are removed from the tag -->
         <canvas id="unity-canvas" tabindex="-1"></canvas>
       </div>
     </div>
@@ -139,7 +137,6 @@
     </div>
     
     <script>
-      // --- ELEMENT SELECTORS ---
       var pageContainer = document.querySelector("#page-container");
       var unityContainer = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -160,20 +157,17 @@
           location.reload();
       }
 
-      // --- [FINAL] SCALING AND LETTERBOXING LOGIC ---
+      // --- [HYBRID] SCALING AND LETTERBOXING LOGIC ---
       function applyLetterboxing() {
-          // Determine orientation and the game's target aspect ratio
           const isPortrait = window.innerHeight > window.innerWidth;
           const targetAspectRatio = isPortrait ? (9 / 16) : (16 / 9);
 
-          // Get the size of the container that holds the canvas
           let containerWidth = unityContainer.offsetWidth;
           let containerHeight = unityContainer.offsetHeight;
           let containerAspectRatio = containerWidth / containerHeight;
           
           let newWidth, newHeight;
           
-          // Calculate the new size of the canvas to fit the container
           if (containerAspectRatio > targetAspectRatio) {
               newHeight = containerHeight;
               newWidth = newHeight * targetAspectRatio;
@@ -182,30 +176,29 @@
               newHeight = newWidth / targetAspectRatio;
           }
 
-          // [THE FIX] Round the final CSS size to the nearest whole number.
-          // This prevents the browser from rounding and creating a resize feedback loop.
           const finalWidth = Math.round(newWidth);
           const finalHeight = Math.round(newHeight);
           
-          // Apply the calculated size to the canvas's style
           canvas.style.width = finalWidth + 'px';
           canvas.style.height = finalHeight + 'px';
 
-          // Apply the fixed internal rendering resolution based on orientation
+          // [THE FIX] Apply a different resolution strategy based on orientation.
           if (isPortrait) {
+              // For Portrait, use the FIXED resolution that works well.
               canvas.width = 1080;
               canvas.height = 1920;
           } else {
-              canvas.width = 1920;
-              canvas.height = 1080;
+              // For Landscape, use the DYNAMIC resolution that works well.
+              // This ensures sharpness and correct scaling on various monitor sizes.
+              const dpr = window.devicePixelRatio || 1;
+              canvas.width = Math.round(finalWidth * dpr);
+              canvas.height = Math.round(finalHeight * dpr);
           }
       }
 
-      // Add listeners to re-apply letterboxing on resize or orientation change
       window.addEventListener('resize', applyLetterboxing);
       window.addEventListener('orientationchange', applyLetterboxing);
 
-      // --- UNITY BANNER FUNCTION ---
       function unityShowBanner(msg, type) {
         var div = document.createElement('div');
         div.innerHTML = msg;
@@ -230,7 +223,6 @@
         }
       }
 
-      // --- UNITY INSTANCE CONFIGURATION ---
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/Asteroid_destroyer.loader.js";
       var config = {
@@ -262,7 +254,6 @@
         });
       };
       
-      // This listener handles the fullscreen transition smoothly.
       document.addEventListener('fullscreenchange', () => {
           const fullscreenButton = document.getElementById('fullscreen-button');
           if (document.fullscreenElement) {
@@ -270,13 +261,11 @@
           } else {
               fullscreenButton.innerHTML = '<span class="icon">⛶</span><span>Fullscreen</span>';
           }
-          // The timeout waits for the browser's fullscreen animation to finish before resizing.
           setTimeout(applyLetterboxing, 150); 
       });
 
-      // Initial setup calls before loading starts
       applyLetterboxing(); 
       document.body.appendChild(script);
     </script>
   </body>
-</html>
+</html>```
