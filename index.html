@@ -160,36 +160,26 @@
           location.reload();
       }
 
-      // --- DEVICE DETECTION FUNCTION ---
-      function isMobileDevice() {
-        return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      }
-
-      // --- SCALING AND LETTERBOXING LOGIC ---
+      // --- [UPDATED] SCALING AND LETTERBOXING LOGIC ---
       function applyLetterboxing() {
-          let targetAspectRatio;
+          // Define your game's native aspect ratio (e.g., 9:16 for portrait)
+          const GAME_ASPECT_RATIO = 9 / 16;
 
-          // Check if the device is mobile and set aspect ratio accordingly
-          if (isMobileDevice()) {
-            // Portrait aspect ratio for mobile
-            targetAspectRatio = 9 / 16; 
-          } else {
-            // Landscape aspect ratio for desktop
-            targetAspectRatio = 16 / 9;
-          }
-          
           let containerWidth = unityContainer.offsetWidth;
           let containerHeight = unityContainer.offsetHeight;
           let containerAspectRatio = containerWidth / containerHeight;
           
           let newWidth, newHeight;
 
-          if (containerAspectRatio > targetAspectRatio) {
+          // If the container is wider than the game, pillarbox it (black bars on sides)
+          if (containerAspectRatio > GAME_ASPECT_RATIO) {
               newHeight = containerHeight;
-              newWidth = newHeight * targetAspectRatio;
-          } else {
+              newWidth = newHeight * GAME_ASPECT_RATIO;
+          } 
+          // If the container is taller than the game, letterbox it (black bars top/bottom)
+          else {
               newWidth = containerWidth;
-              newHeight = newWidth / targetAspectRatio;
+              newHeight = newWidth / GAME_ASPECT_RATIO;
           }
           
           canvas.style.width = newWidth + 'px';
@@ -257,8 +247,7 @@
         });
       };
       
-      // --- THE CORE FIX ---
-      // This listener handles the fullscreen transition smoothly.
+      // --- [UPDATED] THE CORE FIX for fullscreen ---
       document.addEventListener('fullscreenchange', () => {
           const fullscreenButton = document.getElementById('fullscreen-button');
           if (document.fullscreenElement) {
@@ -266,9 +255,9 @@
           } else {
               fullscreenButton.innerHTML = '<span class="icon">⛶</span><span>Fullscreen</span>';
           }
-          // The timeout is the key: It waits for the browser to finish its fullscreen
-          // animation before resizing the canvas, which prevents the black bars.
-          setTimeout(applyLetterboxing, 100); 
+          // The timeout is key: It waits for the browser to finish its fullscreen
+          // animation before resizing the canvas, which prevents the black screen issue.
+          setTimeout(applyLetterboxing, 150); 
       });
 
       // Initial setup calls before loading starts
