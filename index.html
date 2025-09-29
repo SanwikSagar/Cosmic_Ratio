@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity Web Player | AstroidDestroyer (DEBUG MODE)</title>
+    <title>Unity Web Player | AstroidDestroyer (Fixed Resolution)</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&display=swap');
@@ -83,8 +83,8 @@
       </div>
 
       <div id="unity-container">
-        <!-- We no longer rely on these initial values; the script will control them. -->
-        <canvas id="unity-canvas" width=1920 height=1080 tabindex="-1"></canvas>
+        <!-- The script now sets the internal width and height dynamically -->
+        <canvas id="unity-canvas" tabindex="-1"></canvas>
         <div id="debug-overlay">Initializing Debugger...</div>
       </div>
     </div>
@@ -116,18 +116,20 @@
 
       function restartGame() { location.reload(); }
 
-      // --- [FINAL VERSION] SCALING AND LETTERBOXING LOGIC ---
+      // --- [FIXED RESOLUTION] SCALING AND LETTERBOXING LOGIC ---
       function applyLetterboxing(source = 'Unknown') {
           console.log(`%c--- applyLetterboxing triggered by: ${source} ---`, 'color: cyan; font-weight: bold;');
           const debugData = { trigger: source };
 
-          // 1. Determine Target Aspect Ratio
+          // 1. Determine Target Aspect Ratio and FIXED Resolution
           const isPortrait = window.innerHeight > window.innerWidth;
           const targetAspectRatio = isPortrait ? (9 / 16) : (16 / 9);
-          debugData.orientation = isPortrait ? 'Portrait' : 'Landscape';
-          debugData.targetAR = `${targetAspectRatio.toFixed(2)}`;
+          const targetInternalRes = isPortrait ? "1080x1920" : "1920x1080";
           
-          // 2. Calculate new CSS size
+          debugData.orientation = isPortrait ? 'Portrait' : 'Landscape';
+          debugData.targetInternalRes = targetInternalRes;
+
+          // 2. Calculate new CSS size for display (scaling)
           let containerWidth = unityContainer.offsetWidth;
           let containerHeight = unityContainer.offsetHeight;
           let containerAspectRatio = containerWidth / containerHeight;
@@ -143,18 +145,20 @@
           }
           debugData.calculatedCssSize = `${Math.round(newWidth)}x${Math.round(newHeight)}`;
 
-          // 3. Apply CSS size
+          // 3. Apply CSS size for display
           canvas.style.width = newWidth + 'px';
           canvas.style.height = newHeight + 'px';
 
-          // 4. [THE CRITICAL FIX] Manually set the internal resolution to match the CSS size
-          // We multiply by devicePixelRatio for sharpness on high-DPI screens.
-          const dpr = window.devicePixelRatio || 1;
-          debugData.devicePixelRatio = dpr.toFixed(2);
-
-          canvas.width = Math.round(newWidth * dpr);
-          canvas.height = Math.round(newHeight * dpr);
-          console.log(`%cDEBUG: Manually setting canvas INTERNAL resolution to: ${canvas.width}w x ${canvas.height}h`, 'color: lime;');
+          // 4. [THE CRITICAL FIX] Manually set the internal resolution to the FIXED target values.
+          // This decouples rendering resolution from screen size.
+          if (isPortrait) {
+              canvas.width = 1080;
+              canvas.height = 1920;
+          } else {
+              canvas.width = 1920;
+              canvas.height = 1080;
+          }
+          console.log(`%cDEBUG: Forcing canvas INTERNAL resolution to fixed size: ${canvas.width}w x ${canvas.height}h`, 'color: lime; font-weight: bold;');
 
           // 5. Update Debugger
           debugData.finalCssSize = `${canvas.style.width} x ${canvas.style.height}`;
