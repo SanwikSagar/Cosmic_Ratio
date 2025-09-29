@@ -157,14 +157,9 @@
           location.reload();
       }
 
-      function isMobileDevice() {
-        return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      }
-
-      // --- [FINAL w/ ROBUST ORIENTATION CHECK] SCALING LOGIC ---
+      // --- [FINAL UNIVERSAL] SCALING LOGIC ---
       function applyLetterboxing() {
-          // [THE FIX] Use the reliable CSS media query to check orientation.
-          // This avoids the race condition on initial page load in mobile browsers.
+          // Use the reliable CSS media query to check orientation.
           const isPortrait = window.matchMedia("(orientation: portrait)").matches;
           
           const targetAspectRatio = isPortrait ? (9 / 16) : (16 / 9);
@@ -183,27 +178,21 @@
               newHeight = newWidth / targetAspectRatio;
           }
 
+          // Round the final CSS size to prevent resize feedback loops.
           const finalWidth = Math.round(newWidth);
           const finalHeight = Math.round(newHeight);
           
           canvas.style.width = finalWidth + 'px';
           canvas.style.height = finalHeight + 'px';
 
-          // Apply the different resolution strategy based on device type.
-          if (isMobileDevice()) {
-              // For Mobile, use the FIXED resolution that works best.
-              if (isPortrait) {
-                  canvas.width = 1080;
-                  canvas.height = 1920;
-              } else {
-                  canvas.width = 1920;
-                  canvas.height = 1080;
-              }
+          // [THE FIX] Apply the fixed internal resolution for ALL devices.
+          // This ensures consistent behavior everywhere and fixes tall aspect ratio phones.
+          if (isPortrait) {
+              canvas.width = 1080;
+              canvas.height = 1920;
           } else {
-              // For PC, use the DYNAMIC resolution that works best.
-              const dpr = window.devicePixelRatio || 1;
-              canvas.width = Math.round(finalWidth * dpr);
-              canvas.height = Math.round(finalHeight * dpr);
+              canvas.width = 1920;
+              canvas.height = 1080;
           }
       }
 
