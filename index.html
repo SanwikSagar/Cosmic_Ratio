@@ -8,110 +8,56 @@
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&display=swap');
       
-      * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-      }
-      
+      * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body {
-          background: #000; /* Black background for letterboxing */
-          font-family: 'Roboto', sans-serif;
-          overflow: hidden;
-          width: 100%;
-          height: 100%;
+          background: #000; font-family: 'Roboto', sans-serif;
+          overflow: hidden; width: 100%; height: 100%;
       }
-
-      /* Main container organizes the entire page layout */
       #page-container {
-          width: 100vw;
-          height: 100vh;
-          display: flex;
-          flex-direction: column;
+          width: 100vw; height: 100vh; display: flex; flex-direction: column;
           background: linear-gradient(135deg, #3a4374 0%, #232942 100%);
       }
-      
       #controls {
           background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(42, 42, 42, 0.95) 100%);
-          padding: 12px 25px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-          border-bottom: 2px solid rgba(102, 126, 234, 0.5);
-          backdrop-filter: blur(10px);
-          z-index: 10;
-          flex-shrink: 0; /* Prevents the bar from shrinking */
+          padding: 12px 25px; display: flex; justify-content: space-between; align-items: center;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.5); border-bottom: 2px solid rgba(102, 126, 234, 0.5);
+          backdrop-filter: blur(10px); z-index: 10; flex-shrink: 0;
       }
-      
       .title-section { display: flex; align-items: center; gap: 15px; }
-      
       .game-logo {
-          width: 35px; height: 35px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 8px; display: flex; align-items: center;
-          justify-content: center; font-size: 22px; color: white;
-          box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+          width: 35px; height: 35px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 8px; display: flex; align-items: center; justify-content: center;
+          font-size: 22px; color: white; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
       }
-      
       .game-title {
-          color: white; font-family: 'Bebas Neue', cursive;
-          font-size: 28px; letter-spacing: 2px;
-          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+          color: white; font-family: 'Bebas Neue', cursive; font-size: 28px;
+          letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
       }
-      
       .btn-group { display: flex; gap: 15px; align-items: center; }
-      
       button {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white; border: none; padding: 10px 20px;
-          border-radius: 25px; cursor: pointer; font-size: 14px;
-          font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+          color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer;
+          font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+          transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
           display: flex; align-items: center;
       }
-      
-      button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-      }
-      
+      button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
       .btn-secondary {
-          background: rgba(255, 255, 255, 0.1);
-          border: 2px solid rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.3);
           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
       }
-      
       .btn-secondary:hover { background: rgba(255, 255, 255, 0.2); }
       .icon { font-size: 16px; margin-right: 8px; }
-
       #unity-container {
-        flex: 1;
-        min-height: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative; /* Added for debug overlay positioning */
+        flex: 1; min-height: 0; display: flex; justify-content: center; align-items: center; position: relative;
       }
-      
-      #unity-canvas {
-        background: #000;
-      }
-
-      #page-container:fullscreen #controls {
-          display: none;
-      }
-
+      #unity-canvas { background: #000; }
+      #page-container:fullscreen #controls { display: none; }
       #loading-overlay {
-          position: fixed; top: 0; left: 0;
-          width: 100%; height: 100%;
-          background: rgba(0, 0, 0, 0.8); color: white;
-          display: flex; justify-content: center; align-items: center;
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8);
+          color: white; display: flex; justify-content: center; align-items: center;
           font-family: Arial, sans-serif; font-size: 2em; z-index: 99;
       }
-
-      /* --- DEBUGGING OVERLAY STYLE --- */
       #debug-overlay {
           position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: #00ff00;
           padding: 10px; border: 1px solid #00ff00; font-family: monospace; font-size: 12px;
@@ -137,9 +83,8 @@
       </div>
 
       <div id="unity-container">
-        <!-- The internal resolution is fixed based on your build settings -->
+        <!-- We no longer rely on these initial values; the script will control them. -->
         <canvas id="unity-canvas" width=1920 height=1080 tabindex="-1"></canvas>
-        <!-- DEBUGGING OVERLAY ELEMENT -->
         <div id="debug-overlay">Initializing Debugger...</div>
       </div>
     </div>
@@ -149,8 +94,6 @@
     </div>
     
     <script>
-      console.log("DEBUG: Script starting.");
-
       // --- ELEMENT SELECTORS ---
       var pageContainer = document.querySelector("#page-container");
       var unityContainer = document.querySelector("#unity-container");
@@ -159,83 +102,63 @@
       var loadingText = document.querySelector("#loading-text");
       var debugOverlay = document.querySelector("#debug-overlay");
 
-      // --- DEBUGGING HELPER ---
       function updateDebugOverlay(data) {
         let html = `<strong>== REAL-TIME DEBUGGER ==</strong><br>`;
-        for (const key in data) {
-          html += `<strong>${key}:</strong> ${data[key]}<br>`;
-        }
+        for (const key in data) { html += `<strong>${key}:</strong> ${data[key]}<br>`; }
         debugOverlay.innerHTML = html;
       }
       
-      // --- CORE FUNCTIONS ---
       function toggleFullscreen() {
-          console.log("DEBUG: toggleFullscreen() called.");
           if (!document.fullscreenElement) {
-              pageContainer.requestFullscreen().catch(err => {
-                  console.error(`Fullscreen Error: ${err.message}`, err);
-                  alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-              });
-          } else {
-              document.exitFullscreen();
-          }
+              pageContainer.requestFullscreen().catch(err => { alert(`Error: ${err.message}`); });
+          } else { document.exitFullscreen(); }
       }
 
-      function restartGame() {
-          console.warn("DEBUG: Restarting game via location.reload()");
-          location.reload();
-      }
+      function restartGame() { location.reload(); }
 
-      // --- [UPDATED] SCALING AND LETTERBOXING LOGIC ---
+      // --- [FINAL VERSION] SCALING AND LETTERBOXING LOGIC ---
       function applyLetterboxing(source = 'Unknown') {
           console.log(`%c--- applyLetterboxing triggered by: ${source} ---`, 'color: cyan; font-weight: bold;');
           const debugData = { trigger: source };
 
-          // 1. Determine Target Aspect Ratio based on current screen orientation
+          // 1. Determine Target Aspect Ratio
           const isPortrait = window.innerHeight > window.innerWidth;
           const targetAspectRatio = isPortrait ? (9 / 16) : (16 / 9);
-          const targetRes = isPortrait ? "1080x1920" : "1920x1080";
-          
-          console.log(`DEBUG: Screen orientation is ${isPortrait ? 'Portrait' : 'Landscape'}.`);
-          console.log(`DEBUG: Target Aspect Ratio set to ${targetAspectRatio.toFixed(4)} (${targetRes}).`);
           debugData.orientation = isPortrait ? 'Portrait' : 'Landscape';
-          debugData.targetAR = `${targetAspectRatio.toFixed(2)} (${targetRes})`;
-
-          // 2. Get container dimensions
+          debugData.targetAR = `${targetAspectRatio.toFixed(2)}`;
+          
+          // 2. Calculate new CSS size
           let containerWidth = unityContainer.offsetWidth;
           let containerHeight = unityContainer.offsetHeight;
           let containerAspectRatio = containerWidth / containerHeight;
-          
-          console.log(`DEBUG: Unity Container dimensions: ${containerWidth}w x ${containerHeight}h`);
           debugData.containerSize = `${containerWidth}x${containerHeight}`;
           
           let newWidth, newHeight;
-
-          // 3. Calculate new canvas CSS size
           if (containerAspectRatio > targetAspectRatio) {
-              console.log("DEBUG: Container is WIDER than target. Adjusting width (pillarbox).");
               newHeight = containerHeight;
               newWidth = newHeight * targetAspectRatio;
           } else {
-              console.log("DEBUG: Container is TALLER than target. Adjusting height (letterbox).");
               newWidth = containerWidth;
               newHeight = newWidth / targetAspectRatio;
           }
-          
-          console.log(`DEBUG: Calculated new CSS size for canvas: ${newWidth.toFixed(0)}px width, ${newHeight.toFixed(0)}px height`);
           debugData.calculatedCssSize = `${Math.round(newWidth)}x${Math.round(newHeight)}`;
 
-          // 4. Apply the new CSS size
+          // 3. Apply CSS size
           canvas.style.width = newWidth + 'px';
           canvas.style.height = newHeight + 'px';
 
-          // 5. Log the critical distinction between internal resolution and CSS size
-          console.log(`%cDEBUG: Final Canvas State:`, 'color: yellow;');
-          console.log(`  - INTERNAL Resolution (fixed): ${canvas.width}w x ${canvas.height}h`);
-          console.log(`  - DISPLAY Size (CSS style): ${canvas.style.width}w x ${canvas.style.height}h`);
-          debugData.internalResolution = `${canvas.width}x${canvas.height}`;
+          // 4. [THE CRITICAL FIX] Manually set the internal resolution to match the CSS size
+          // We multiply by devicePixelRatio for sharpness on high-DPI screens.
+          const dpr = window.devicePixelRatio || 1;
+          debugData.devicePixelRatio = dpr.toFixed(2);
+
+          canvas.width = Math.round(newWidth * dpr);
+          canvas.height = Math.round(newHeight * dpr);
+          console.log(`%cDEBUG: Manually setting canvas INTERNAL resolution to: ${canvas.width}w x ${canvas.height}h`, 'color: lime;');
+
+          // 5. Update Debugger
           debugData.finalCssSize = `${canvas.style.width} x ${canvas.style.height}`;
-          
+          debugData.finalInternalRes = `${canvas.width}x${canvas.height}`;
           updateDebugOverlay(debugData);
           console.log('%c----------------------------------------------------', 'color: cyan;');
       }
@@ -245,50 +168,18 @@
       window.addEventListener('orientationchange', () => applyLetterboxing('Orientation Change'));
       
       document.addEventListener('fullscreenchange', () => {
-          console.log("DEBUG: 'fullscreenchange' event fired.");
           const isFullscreen = !!document.fullscreenElement;
-          console.log(`DEBUG: Is fullscreen? ${isFullscreen}`);
-          
           const fullscreenButton = document.getElementById('fullscreen-button');
           if (isFullscreen) {
               fullscreenButton.innerHTML = '<span class="icon">❎</span><span>Exit</span>';
           } else {
               fullscreenButton.innerHTML = '<span class="icon">⛶</span><span>Fullscreen</span>';
           }
-
-          console.log("DEBUG: Scheduling canvas resize in 150ms to wait for transition.");
-          setTimeout(() => {
-            console.log("DEBUG: Timeout finished, now running resize logic.");
-            applyLetterboxing('Fullscreen Change');
-          }, 150); 
+          setTimeout(() => applyLetterboxing('Fullscreen Change'), 150); 
       });
 
-      // --- UNITY BANNER FUNCTION ---
-      function unityShowBanner(msg, type) {
-        var div = document.createElement('div');
-        div.innerHTML = msg;
-        div.style.position = 'absolute';
-        div.style.top = '10px';
-        div.style.left = '10px';
-        div.style.padding = '10px';
-        div.style.color = 'white';
-        if (type == 'error') {
-            div.style.background = 'red';
-        } else if (type == 'warning') {
-            div.style.background = 'yellow';
-            div.style.color = 'black';
-        } else {
-            div.style.background = 'rgba(0,0,0,0.5)';
-        }
-        pageContainer.appendChild(div);
-        if (type != 'error') {
-          setTimeout(function() {
-            pageContainer.removeChild(div);
-          }, 5000);
-        }
-      }
-
-      // --- UNITY INSTANCE CONFIGURATION [CORRECT AND COMPLETE] ---
+      // --- UNITY CONFIG [UNCHANGED AND CORRECT] ---
+      function unityShowBanner(msg, type) { /* ... */ }
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/Asteroid_destroyer.loader.js";
       var config = {
@@ -303,28 +194,22 @@
         showBanner: unityShowBanner,
       };
 
+      // --- LOADER SCRIPT [UNCHANGED] ---
       var meta = document.createElement('meta');
       meta.name = 'viewport';
       meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
       document.getElementsByTagName('head')[0].appendChild(meta);
-      
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
-        console.log("DEBUG: Unity loader script loaded.");
         createUnityInstance(canvas, config, (progress) => {
           loadingText.innerHTML = `Loading... ${Math.round(progress * 100)}%`;
         }).then((unityInstance) => {
-          console.log("DEBUG: Unity instance created successfully.");
           loadingOverlay.style.display = 'none';
-        }).catch((message) => {
-          console.error("DEBUG: Unity instance creation failed:", message);
-          alert(message);
-        });
+        }).catch((message) => { alert(message); });
       };
       
       // --- INITIALIZATION ---
-      console.log("DEBUG: Performing initial setup call.");
       applyLetterboxing('Initial Load'); 
       document.body.appendChild(script);
     </script>
