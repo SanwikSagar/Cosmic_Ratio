@@ -161,8 +161,12 @@
         return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       }
 
+      // --- [FINAL w/ ROBUST ORIENTATION CHECK] SCALING LOGIC ---
       function applyLetterboxing() {
-          const isPortrait = window.innerHeight > window.innerWidth;
+          // [THE FIX] Use the reliable CSS media query to check orientation.
+          // This avoids the race condition on initial page load in mobile browsers.
+          const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+          
           const targetAspectRatio = isPortrait ? (9 / 16) : (16 / 9);
 
           let containerWidth = unityContainer.offsetWidth;
@@ -185,7 +189,9 @@
           canvas.style.width = finalWidth + 'px';
           canvas.style.height = finalHeight + 'px';
 
+          // Apply the different resolution strategy based on device type.
           if (isMobileDevice()) {
+              // For Mobile, use the FIXED resolution that works best.
               if (isPortrait) {
                   canvas.width = 1080;
                   canvas.height = 1920;
@@ -194,6 +200,7 @@
                   canvas.height = 1080;
               }
           } else {
+              // For PC, use the DYNAMIC resolution that works best.
               const dpr = window.devicePixelRatio || 1;
               canvas.width = Math.round(finalWidth * dpr);
               canvas.height = Math.round(finalHeight * dpr);
@@ -203,7 +210,29 @@
       window.addEventListener('resize', applyLetterboxing);
       window.addEventListener('orientationchange', applyLetterboxing);
 
-      function unityShowBanner(msg, type) { /* ... same as before ... */ }
+      function unityShowBanner(msg, type) {
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        div.style.position = 'absolute';
+        div.style.top = '10px';
+        div.style.left = '10px';
+        div.style.padding = '10px';
+        div.style.color = 'white';
+        if (type == 'error') {
+            div.style.background = 'red';
+        } else if (type == 'warning') {
+            div.style.background = 'yellow';
+            div.style.color = 'black';
+        } else {
+            div.style.background = 'rgba(0,0,0,0.5)';
+        }
+        pageContainer.appendChild(div);
+        if (type != 'error') {
+          setTimeout(function() {
+            pageContainer.removeChild(div);
+          }, 5000);
+        }
+      }
 
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/Asteroid_destroyer.loader.js";
@@ -231,9 +260,6 @@
           loadingText.innerHTML = `Loading... ${Math.round(progress * 100)}%`;
         }).then((unityInstance) => {
           loadingOverlay.style.display = 'none';
-          // [THE CRITICAL FIX] Call applyLetterboxing for the first time AFTER Unity is fully loaded.
-          // This ensures our settings override Unity's default startup settings.
-          applyLetterboxing();
         }).catch((message) => {
           alert(message);
         });
@@ -249,7 +275,7 @@
           setTimeout(applyLetterboxing, 150); 
       });
 
-      // We no longer call applyLetterboxing here, we wait for the engine to load first.
+      applyLetterboxing(); 
       document.body.appendChild(script);
     </script>
   </body>
