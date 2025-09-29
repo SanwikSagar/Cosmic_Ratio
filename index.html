@@ -8,56 +8,109 @@
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&display=swap');
       
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body {
-          background: #000; font-family: 'Roboto', sans-serif;
-          overflow: hidden; width: 100%; height: 100%;
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
       }
+      
+      html, body {
+          background: #000; /* Black background for letterboxing */
+          font-family: 'Roboto', sans-serif;
+          overflow: hidden;
+          width: 100%;
+          height: 100%;
+      }
+
+      /* Main container organizes the entire page layout */
       #page-container {
-          width: 100vw; height: 100vh; display: flex; flex-direction: column;
+          width: 100vw;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
           background: linear-gradient(135deg, #3a4374 0%, #232942 100%);
       }
+      
       #controls {
           background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(42, 42, 42, 0.95) 100%);
-          padding: 12px 25px; display: flex; justify-content: space-between; align-items: center;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.5); border-bottom: 2px solid rgba(102, 126, 234, 0.5);
-          backdrop-filter: blur(10px); z-index: 10; flex-shrink: 0;
+          padding: 12px 25px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+          border-bottom: 2px solid rgba(102, 126, 234, 0.5);
+          backdrop-filter: blur(10px);
+          z-index: 10;
+          flex-shrink: 0; /* Prevents the bar from shrinking */
       }
+      
       .title-section { display: flex; align-items: center; gap: 15px; }
+      
       .game-logo {
-          width: 35px; height: 35px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 8px; display: flex; align-items: center; justify-content: center;
-          font-size: 22px; color: white; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+          width: 35px; height: 35px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 8px; display: flex; align-items: center;
+          justify-content: center; font-size: 22px; color: white;
+          box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
       }
+      
       .game-title {
-          color: white; font-family: 'Bebas Neue', cursive; font-size: 28px;
-          letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+          color: white; font-family: 'Bebas Neue', cursive;
+          font-size: 28px; letter-spacing: 2px;
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
       }
+      
       .btn-group { display: flex; gap: 15px; align-items: center; }
+      
       button {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer;
-          font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-          transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+          color: white; border: none; padding: 10px 20px;
+          border-radius: 25px; cursor: pointer; font-size: 14px;
+          font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
           display: flex; align-items: center;
       }
-      button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
+      
+      button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+      }
+      
       .btn-secondary {
-          background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.1);
+          border: 2px solid rgba(255, 255, 255, 0.3);
           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
       }
+      
       .btn-secondary:hover { background: rgba(255, 255, 255, 0.2); }
       .icon { font-size: 16px; margin-right: 8px; }
+
       #unity-container {
-        flex: 1; min-height: 0; display: flex; justify-content: center; align-items: center; position: relative;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative; /* Added for debug overlay positioning */
       }
-      #unity-canvas { background: #000; }
-      #page-container:fullscreen #controls { display: none; }
+      
+      #unity-canvas {
+        background: #000;
+      }
+
+      #page-container:fullscreen #controls {
+          display: none;
+      }
+
       #loading-overlay {
-          position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8);
-          color: white; display: flex; justify-content: center; align-items: center;
+          position: fixed; top: 0; left: 0;
+          width: 100%; height: 100%;
+          background: rgba(0, 0, 0, 0.8); color: white;
+          display: flex; justify-content: center; align-items: center;
           font-family: Arial, sans-serif; font-size: 2em; z-index: 99;
       }
+
       /* --- DEBUGGING OVERLAY STYLE --- */
       #debug-overlay {
           position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: #00ff00;
@@ -133,7 +186,7 @@
           location.reload();
       }
 
-      // --- [HEAVILY UPDATED] SCALING AND LETTERBOXING LOGIC ---
+      // --- [UPDATED] SCALING AND LETTERBOXING LOGIC ---
       function applyLetterboxing(source = 'Unknown') {
           console.log(`%c--- applyLetterboxing triggered by: ${source} ---`, 'color: cyan; font-weight: bold;');
           const debugData = { trigger: source };
@@ -203,7 +256,6 @@
               fullscreenButton.innerHTML = '<span class="icon">⛶</span><span>Fullscreen</span>';
           }
 
-          // The timeout is crucial to wait for browser animation
           console.log("DEBUG: Scheduling canvas resize in 150ms to wait for transition.");
           setTimeout(() => {
             console.log("DEBUG: Timeout finished, now running resize logic.");
@@ -212,12 +264,44 @@
       });
 
       // --- UNITY BANNER FUNCTION ---
-      function unityShowBanner(msg, type) { /* ... no changes needed here ... */ }
+      function unityShowBanner(msg, type) {
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        div.style.position = 'absolute';
+        div.style.top = '10px';
+        div.style.left = '10px';
+        div.style.padding = '10px';
+        div.style.color = 'white';
+        if (type == 'error') {
+            div.style.background = 'red';
+        } else if (type == 'warning') {
+            div.style.background = 'yellow';
+            div.style.color = 'black';
+        } else {
+            div.style.background = 'rgba(0,0,0,0.5)';
+        }
+        pageContainer.appendChild(div);
+        if (type != 'error') {
+          setTimeout(function() {
+            pageContainer.removeChild(div);
+          }, 5000);
+        }
+      }
 
-      // --- UNITY INSTANCE CONFIGURATION ---
+      // --- UNITY INSTANCE CONFIGURATION [CORRECT AND COMPLETE] ---
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/Asteroid_destroyer.loader.js";
-      var config = { /* ... no changes needed here ... */ };
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/Asteroid_destroyer.data",
+        frameworkUrl: buildUrl + "/Asteroid_destroyer.framework.js",
+        codeUrl: buildUrl + "/Asteroid_destroyer.wasm",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "AstroidDestroyer",
+        productVersion: "1.1",
+        showBanner: unityShowBanner,
+      };
 
       var meta = document.createElement('meta');
       meta.name = 'viewport';
