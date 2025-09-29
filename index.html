@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity Web Player | AstroidDestroyer (Fixed Resolution)</title>
+    <title>Unity Web Player | AstroidDestroyer (Final Fix)</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&display=swap');
@@ -83,7 +83,6 @@
       </div>
 
       <div id="unity-container">
-        <!-- The script now sets the internal width and height dynamically -->
         <canvas id="unity-canvas" tabindex="-1"></canvas>
         <div id="debug-overlay">Initializing Debugger...</div>
       </div>
@@ -94,7 +93,6 @@
     </div>
     
     <script>
-      // --- ELEMENT SELECTORS ---
       var pageContainer = document.querySelector("#page-container");
       var unityContainer = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -116,12 +114,11 @@
 
       function restartGame() { location.reload(); }
 
-      // --- [FIXED RESOLUTION] SCALING AND LETTERBOXING LOGIC ---
+      // --- [FINAL VERSION w/ LANDSCAPE FIX] SCALING AND LETTERBOXING LOGIC ---
       function applyLetterboxing(source = 'Unknown') {
           console.log(`%c--- applyLetterboxing triggered by: ${source} ---`, 'color: cyan; font-weight: bold;');
           const debugData = { trigger: source };
 
-          // 1. Determine Target Aspect Ratio and FIXED Resolution
           const isPortrait = window.innerHeight > window.innerWidth;
           const targetAspectRatio = isPortrait ? (9 / 16) : (16 / 9);
           const targetInternalRes = isPortrait ? "1080x1920" : "1920x1080";
@@ -129,28 +126,36 @@
           debugData.orientation = isPortrait ? 'Portrait' : 'Landscape';
           debugData.targetInternalRes = targetInternalRes;
 
-          // 2. Calculate new CSS size for display (scaling)
           let containerWidth = unityContainer.offsetWidth;
           let containerHeight = unityContainer.offsetHeight;
           let containerAspectRatio = containerWidth / containerHeight;
           debugData.containerSize = `${containerWidth}x${containerHeight}`;
           
           let newWidth, newHeight;
-          if (containerAspectRatio > targetAspectRatio) {
+          
+          // [THE CRITICAL FIX] Check if the aspect ratio is ALMOST the same as the target.
+          // This handles floating point inaccuracies for fullscreen landscape monitors.
+          const epsilon = 0.01; 
+          if (Math.abs(containerAspectRatio - targetAspectRatio) < epsilon) {
+              console.log("DEBUG: Aspect ratio is a near-perfect match. Filling container.");
+              newWidth = containerWidth;
+              newHeight = containerHeight;
+          }
+          // If not a perfect match, apply standard letterboxing logic.
+          else if (containerAspectRatio > targetAspectRatio) {
+              console.log("DEBUG: Container is wider than target. Applying pillarbox.");
               newHeight = containerHeight;
               newWidth = newHeight * targetAspectRatio;
           } else {
+              console.log("DEBUG: Container is taller than target. Applying letterbox.");
               newWidth = containerWidth;
               newHeight = newWidth / targetAspectRatio;
           }
           debugData.calculatedCssSize = `${Math.round(newWidth)}x${Math.round(newHeight)}`;
 
-          // 3. Apply CSS size for display
           canvas.style.width = newWidth + 'px';
           canvas.style.height = newHeight + 'px';
 
-          // 4. [THE CRITICAL FIX] Manually set the internal resolution to the FIXED target values.
-          // This decouples rendering resolution from screen size.
           if (isPortrait) {
               canvas.width = 1080;
               canvas.height = 1920;
@@ -160,14 +165,12 @@
           }
           console.log(`%cDEBUG: Forcing canvas INTERNAL resolution to fixed size: ${canvas.width}w x ${canvas.height}h`, 'color: lime; font-weight: bold;');
 
-          // 5. Update Debugger
           debugData.finalCssSize = `${canvas.style.width} x ${canvas.style.height}`;
           debugData.finalInternalRes = `${canvas.width}x${canvas.height}`;
           updateDebugOverlay(debugData);
           console.log('%c----------------------------------------------------', 'color: cyan;');
       }
 
-      // --- EVENT LISTENERS ---
       window.addEventListener('resize', () => applyLetterboxing('Window Resize'));
       window.addEventListener('orientationchange', () => applyLetterboxing('Orientation Change'));
       
@@ -182,7 +185,6 @@
           setTimeout(() => applyLetterboxing('Fullscreen Change'), 150); 
       });
 
-      // --- UNITY CONFIG [UNCHANGED AND CORRECT] ---
       function unityShowBanner(msg, type) { /* ... */ }
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/Asteroid_destroyer.loader.js";
@@ -198,7 +200,6 @@
         showBanner: unityShowBanner,
       };
 
-      // --- LOADER SCRIPT [UNCHANGED] ---
       var meta = document.createElement('meta');
       meta.name = 'viewport';
       meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
@@ -213,7 +214,6 @@
         }).catch((message) => { alert(message); });
       };
       
-      // --- INITIALIZATION ---
       applyLetterboxing('Initial Load'); 
       document.body.appendChild(script);
     </script>
