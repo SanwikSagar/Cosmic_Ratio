@@ -157,7 +157,12 @@
           location.reload();
       }
 
-      // --- [HYBRID] SCALING AND LETTERBOXING LOGIC ---
+      // --- DEVICE DETECTION FUNCTION ---
+      function isMobileDevice() {
+        return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      }
+
+      // --- [FINAL HYBRID] SCALING AND LETTERBOXING LOGIC ---
       function applyLetterboxing() {
           const isPortrait = window.innerHeight > window.innerWidth;
           const targetAspectRatio = isPortrait ? (9 / 16) : (16 / 9);
@@ -182,14 +187,18 @@
           canvas.style.width = finalWidth + 'px';
           canvas.style.height = finalHeight + 'px';
 
-          // [THE FIX] Apply a different resolution strategy based on orientation.
-          if (isPortrait) {
-              // For Portrait, use the FIXED resolution that works well.
-              canvas.width = 1080;
-              canvas.height = 1920;
+          // [THE FIX] Apply a different resolution strategy based on device type.
+          if (isMobileDevice()) {
+              // For Mobile, use the FIXED resolution that works best.
+              if (isPortrait) {
+                  canvas.width = 1080;
+                  canvas.height = 1920;
+              } else {
+                  canvas.width = 1920;
+                  canvas.height = 1080;
+              }
           } else {
-              // For Landscape, use the DYNAMIC resolution that works well.
-              // This ensures sharpness and correct scaling on various monitor sizes.
+              // For PC, use the DYNAMIC resolution that works best.
               const dpr = window.devicePixelRatio || 1;
               canvas.width = Math.round(finalWidth * dpr);
               canvas.height = Math.round(finalHeight * dpr);
@@ -268,4 +277,4 @@
       document.body.appendChild(script);
     </script>
   </body>
-</html>```
+</html>
