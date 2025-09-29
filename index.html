@@ -138,16 +138,16 @@
       <div id="loading-text">Loading... 0%</div>
     </div>
     
+    <script>
+      // --- ELEMENT SELECTORS ---
       var pageContainer = document.querySelector("#page-container");
       var unityContainer = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingOverlay = document.querySelector("#loading-overlay");
       var loadingText = document.querySelector("#loading-text");
-      var fullscreenButton = document.getElementById('fullscreen-button');
 
       function toggleFullscreen() {
           if (!document.fullscreenElement) {
-              // We request fullscreen on the main page container
               pageContainer.requestFullscreen().catch(err => {
                   alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
               });
@@ -165,14 +165,16 @@
         return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       }
 
-      // --- IMPROVED SCALING AND LETTERBOXING LOGIC ---
-      function resizeCanvas() {
+      // --- SCALING AND LETTERBOXING LOGIC ---
+      function applyLetterboxing() {
           let targetAspectRatio;
 
-          // Use portrait for mobile, landscape for desktop
-          if (isMobileDevice() && window.innerHeight > window.innerWidth) {
-            targetAspectRatio = 9 / 16;
+          // Check if the device is mobile and set aspect ratio accordingly
+          if (isMobileDevice()) {
+            // Portrait aspect ratio for mobile
+            targetAspectRatio = 9 / 16; 
           } else {
+            // Landscape aspect ratio for desktop
             targetAspectRatio = 16 / 9;
           }
           
@@ -182,7 +184,6 @@
           
           let newWidth, newHeight;
 
-          // Calculate the new size based on the aspect ratio to fit the container
           if (containerAspectRatio > targetAspectRatio) {
               newHeight = containerHeight;
               newWidth = newHeight * targetAspectRatio;
@@ -196,20 +197,32 @@
       }
 
       // Add listeners to re-apply letterboxing on resize or orientation change
-      window.addEventListener('resize', resizeCanvas);
-      window.addEventListener('orientationchange', resizeCanvas);
+      window.addEventListener('resize', applyLetterboxing);
+      window.addEventListener('orientationchange', applyLetterboxing);
 
       // --- UNITY BANNER FUNCTION (FROM YOUR BASE FILE) ---
       function unityShowBanner(msg, type) {
         var div = document.createElement('div');
         div.innerHTML = msg;
-        div.style.position = 'absolute'; div.style.top = '10px'; div.style.left = '10px';
-        div.style.padding = '10px'; div.style.color = 'white';
-        if (type == 'error') div.style.background = 'red';
-        else if (type == 'warning') { div.style.background = 'yellow'; div.style.color = 'black'; }
-        else div.style.background = 'rgba(0,0,0,0.5)';
+        div.style.position = 'absolute';
+        div.style.top = '10px';
+        div.style.left = '10px';
+        div.style.padding = '10px';
+        div.style.color = 'white';
+        if (type == 'error') {
+            div.style.background = 'red';
+        } else if (type == 'warning') {
+            div.style.background = 'yellow';
+            div.style.color = 'black';
+        } else {
+            div.style.background = 'rgba(0,0,0,0.5)';
+        }
         pageContainer.appendChild(div);
-        if (type != 'error') setTimeout(() => pageContainer.removeChild(div), 5000);
+        if (type != 'error') {
+          setTimeout(function() {
+            pageContainer.removeChild(div);
+          }, 5000);
+        }
       }
 
       // --- UNITY INSTANCE CONFIGURATION ---
@@ -244,20 +257,22 @@
         });
       };
       
-      // --- ROBUST FULLSCREEN CHANGE HANDLER ---
+      // --- THE CORE FIX ---
+      // This listener handles the fullscreen transition smoothly.
       document.addEventListener('fullscreenchange', () => {
+          const fullscreenButton = document.getElementById('fullscreen-button');
           if (document.fullscreenElement) {
               fullscreenButton.innerHTML = '<span class="icon">❎</span><span>Exit</span>';
           } else {
               fullscreenButton.innerHTML = '<span class="icon">⛶</span><span>Fullscreen</span>';
           }
-          // Use a small timeout. This gives the browser a moment to stabilize
-          // its new dimensions before we calculate the canvas size. This is key to avoiding the black bars.
-          setTimeout(resizeCanvas, 100); 
+          // The timeout is the key: It waits for the browser to finish its fullscreen
+          // animation before resizing the canvas, which prevents the black bars.
+          setTimeout(applyLetterboxing, 100); 
       });
 
       // Initial setup calls before loading starts
-      resizeCanvas(); 
+      applyLetterboxing(); 
       document.body.appendChild(script);
     </script>
   </body>
